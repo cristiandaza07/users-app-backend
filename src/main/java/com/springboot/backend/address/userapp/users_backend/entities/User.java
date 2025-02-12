@@ -1,14 +1,25 @@
 package com.springboot.backend.address.userapp.users_backend.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 import static jakarta.persistence.GenerationType.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.ManyToAny;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -37,8 +48,21 @@ public class User {
     private String userName;
 
     @NotBlank
-    @Size(min = 5, max = 15)
     private String password;
+
+    @JsonIgnoreProperties({"handler", "hibernateLazyInitializer"}) //Ignora las dos propiedades durante la serialización JSON
+    @ManyToAny(fetch = FetchType.LAZY) //Define una relación muchos a muchos
+    @JoinTable( //Especifica la tabla e unión para la relación muchos a muchos
+        name = "users_roles", 
+        joinColumns = { @JoinColumn(name = "user_id")},
+        inverseJoinColumns = @JoinColumn(name = "role_id"),
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id, role_id"})}               
+    )
+    private List<Role> roles; //Lista de roles del usuario
+
+    public User() {
+        this.roles = new ArrayList<>();
+    }
     
     public Long getId() {
         return id;
@@ -77,5 +101,13 @@ public class User {
         this.password = password;
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+    
     
 }
