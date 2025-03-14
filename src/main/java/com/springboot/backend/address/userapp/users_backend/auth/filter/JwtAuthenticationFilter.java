@@ -68,11 +68,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .getPrincipal();
         String userName = user.getUsername();
         Collection<? extends GrantedAuthority> roles = authResult.getAuthorities(); //Obtenemos los roles de usuario
+        boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
         Claims claims = Jwts.claims()
             .add("authorities", new ObjectMapper().writeValueAsString(roles))
             .add("username", userName)
-                .build();
+            .add("isAdmin", isAdmin)
+            .build();
 
         //Creación del JWT (JSON Web Token)
         String jwt = Jwts.builder()

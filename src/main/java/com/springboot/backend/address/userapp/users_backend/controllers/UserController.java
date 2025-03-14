@@ -3,6 +3,7 @@ package com.springboot.backend.address.userapp.users_backend.controllers;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.backend.address.userapp.users_backend.entities.User;
+import com.springboot.backend.address.userapp.users_backend.models.UserRequestDTO;
 import com.springboot.backend.address.userapp.users_backend.services.UserService;
 
 import jakarta.validation.Valid;
@@ -45,7 +46,7 @@ public class UserController {
 
     @GetMapping("/page/{page}")
     public Page<User> listPageable(@PathVariable Integer page) {
-        Pageable pageable = PageRequest.of(page, 2);
+        Pageable pageable = PageRequest.of(page, 4);
         return service.findAll(pageable);
     }
 
@@ -69,7 +70,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@Valid @RequestBody User user, BindingResult result, @PathVariable Long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody UserRequestDTO user, BindingResult result, @PathVariable Long id) {
         if (result.hasErrors()) {
             return validation(result);
         }
